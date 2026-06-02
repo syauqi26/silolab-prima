@@ -1,0 +1,182 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 1. Global Catch-All Safety Net (Default Deny)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // 2. Global Helper Functions
+    function isSignedIn() {
+      return true;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-+%]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // 3. Validation Helpers for Entities
+    function isValidPegawai(data) {
+      return data.nip is string && data.nip.size() <= 64
+        && data.nama is string && data.nama.size() <= 200
+        && data.jabatan is string && data.jabatan.size() <= 200
+        && (!('password' in data) || (data.password is string && data.password.size() <= 200))
+        && data.keys().hasAll(['nip', 'nama', 'jabatan'])
+        && (data.keys().size() == 3 || data.keys().size() == 4);
+    }
+
+    // DivisiLab is high-level category string
+    function isValidBarang(data) {
+      return data.kodeBarang is string && data.kodeBarang.size() <= 64
+        && data.namaBarang is string && data.namaBarang.size() <= 200
+        && data.satuan is string && data.satuan.size() <= 50
+        && data.stokMinimum is number && data.stokMinimum >= 0
+        && data.kategori is string && data.kategori.size() <= 100
+        && data.keys().hasAll(['kodeBarang', 'namaBarang', 'satuan', 'stokMinimum', 'kategori'])
+        && data.keys().size() == 5;
+    }
+
+    function isValidBatchStok(data) {
+      return data.kodeBarang is string && data.kodeBarang.size() <= 64
+        && data.tanggalExpired is string && data.tanggalExpired.size() <= 20
+        && data.jumlah is number && data.jumlah >= 0
+        && data.keys().hasAll(['kodeBarang', 'tanggalExpired', 'jumlah'])
+        && data.keys().size() == 3;
+    }
+
+    function isValidMutasiBarang(data) {
+      return data.id is string && data.id.size() <= 128
+        && data.jenis is string && (data.jenis == 'MASUK' || data.jenis == 'KELUAR')
+        && data.kodeBarang is string && data.kodeBarang.size() <= 64
+        && data.jumlah is number && data.jumlah >= 0
+        && data.tanggal is string && data.tanggal.size() <= 20
+        && data.keterangan is string && data.keterangan.size() <= 1000
+        && data.operator is string && data.operator.size() <= 200
+        && (!('tanggalExpired' in data) || (data.tanggalExpired is string && data.tanggalExpired.size() <= 20))
+        && (!('picLuarNip' in data) || (data.picLuarNip is string && data.picLuarNip.size() <= 64))
+        && (!('picLuarNama' in data) || (data.picLuarNama is string && data.picLuarNama.size() <= 200))
+        && (!('noSuratReferensi' in data) || (data.noSuratReferensi is string && data.noSuratReferensi.size() <= 128));
+    }
+
+    function isValidPermintaanBarang(data) {
+      return data.noSurat is string && data.noSurat.size() <= 128
+        && data.tanggal is string && data.tanggal.size() <= 20
+        && data.tujuan is string && (data.tujuan == 'Logistik Farmasi' || data.tujuan == 'ATK')
+        && data.isCito is bool
+        && data.status is string && data.status.size() <= 50
+        && data.ttdKepalaNip is string && data.ttdKepalaNip.size() <= 64
+        && data.ttdKepalaNama is string && data.ttdKepalaNama.size() <= 200
+        && data.tanggalTtd is string && data.tanggalTtd.size() <= 20
+        && data.items is list;
+    }
+
+    function isValidLogPenerimaan(data) {
+      return data.id is string && data.id.size() <= 128
+        && data.tanggal is string && data.tanggal.size() <= 20
+        && data.operatorNip is string && data.operatorNip.size() <= 64
+        && data.operatorNama is string && data.operatorNama.size() <= 200
+        && data.logfarNip is string && data.logfarNip.size() <= 64
+        && data.logfarNama is string && data.logfarNama.size() <= 200
+        && data.items is list
+        && (!('noSuratReferensi' in data) || (data.noSuratReferensi is string && data.noSuratReferensi.size() <= 128));
+    }
+
+    function isValidSystemSettings(data) {
+      return data.id is string && data.id.size() <= 128
+        && data.backupEnabled is bool
+        && data.backupSchedule is string && (data.backupSchedule == 'Harian' || data.backupSchedule == 'Mingguan' || data.backupSchedule == 'Manual')
+        && data.pilihanKertas is string && (data.pilihanKertas == 'A4' || data.pilihanKertas == 'F4' || data.pilihanKertas == 'Letter')
+        && data.marginAtas is number
+        && data.marginBawah is number
+        && data.marginKiri is number
+        && data.marginKanan is number
+        && data.penanggungJawabNip is string && data.penanggungJawabNip.size() <= 64
+        && data.penanggungJawabNama is string && data.penanggungJawabNama.size() <= 200
+        && data.penanggungJawabJabatan is string && data.penanggungJawabJabatan.size() <= 200
+        && (!('lastBackupTime' in data) || data.lastBackupTime is string);
+    }
+
+    function isValidLaporanBulanan(data) {
+      return data.id is string && data.id.size() <= 128
+        && data.bulan is string && data.bulan.size() <= 10
+        && data.tahun is string && data.tahun.size() <= 10
+        && data.penanggungJawabNip is string && data.penanggungJawabNip.size() <= 64
+        && data.penanggungJawabNama is string && data.penanggungJawabNama.size() <= 200
+        && data.penanggungJawabJabatan is string && data.penanggungJawabJabatan.size() <= 200
+        && data.tanggalCetak is string && data.tanggalCetak.size() <= 20;
+    }
+
+    function isValidLogAktivitas(data) {
+      return data.id is string && data.id.size() <= 128
+        && data.nip is string && data.nip.size() <= 64
+        && data.pesan is string && data.pesan.size() <= 2000
+        && data.timestamp is string && data.timestamp.size() <= 100
+        && data.keys().hasAll(['id', 'nip', 'pesan', 'timestamp'])
+        && data.keys().size() == 4;
+    }
+
+    // 4. Collection Rule Block Mappings
+    match /pegawai/{nip} {
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn() && isValidId(nip) && isValidPegawai(incoming());
+      allow delete: if isSignedIn() && isValidId(nip);
+    }
+
+    match /barang/{kodeBarang} {
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn() && isValidId(kodeBarang) && isValidBarang(incoming());
+      allow delete: if isSignedIn() && isValidId(kodeBarang);
+    }
+
+    match /stok/{stokId} {
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn() && isValidId(stokId) && isValidBatchStok(incoming());
+      allow delete: if isSignedIn() && isValidId(stokId);
+    }
+
+    match /mutasi/{mutasiId} {
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn() && isValidId(mutasiId) && isValidMutasiBarang(incoming());
+      allow delete: if isSignedIn() && isValidId(mutasiId);
+    }
+
+    match /permintaan/{permintaanId} {
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn() && isValidId(permintaanId) && isValidPermintaanBarang(incoming());
+      allow delete: if isSignedIn() && isValidId(permintaanId);
+    }
+
+    match /penerimaan/{penerimaanId} {
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn() && isValidId(penerimaanId) && isValidLogPenerimaan(incoming());
+      allow delete: if isSignedIn() && isValidId(penerimaanId);
+    }
+
+    match /SystemSettings/{settingsId} {
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn() && isValidId(settingsId) && isValidSystemSettings(incoming());
+      allow delete: if isSignedIn() && isValidId(settingsId);
+    }
+
+    match /LaporanBulanan/{reportId} {
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn() && isValidId(reportId) && isValidLaporanBulanan(incoming());
+      allow delete: if isSignedIn() && isValidId(reportId);
+    }
+
+    match /log_aktivitas/{logId} {
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn() && isValidId(logId) && isValidLogAktivitas(incoming());
+      allow delete: if isSignedIn() && isValidId(logId);
+    }
+  }
+}

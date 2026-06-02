@@ -1,0 +1,8 @@
+{
+  "name": "Remix: SILOLAB PRIMA",
+  "description": "Sistem Logistik Lab Husada Prima by Yusri Hikmawati, S.ST. Aplikasi inventaris barang keluar masuk reagen dan bahan medis habis pakai (BMHP) RSUD Husada Prima Surabaya.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

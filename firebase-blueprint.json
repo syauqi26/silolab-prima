@@ -1,0 +1,296 @@
+{
+  "entities": {
+    "Pegawai": {
+      "title": "Pegawai",
+      "description": "Pegawai instansi laboratorium dan logistik pendukung",
+      "type": "object",
+      "properties": {
+        "nip": {
+          "type": "string",
+          "description": "Nomor Induk Pegawai unik"
+        },
+        "nama": {
+          "type": "string",
+          "description": "Nama lengkap pegawai"
+        },
+        "jabatan": {
+          "type": "string",
+          "description": "Jabatan fungsional atau struktural"
+        },
+        "password": {
+          "type": "string",
+          "description": "Kata sandi masuk"
+        }
+      },
+      "required": ["nip", "nama", "jabatan"]
+    },
+    "Barang": {
+      "title": "Barang",
+      "description": "Master barang atau reagen laboratorium",
+      "type": "object",
+      "properties": {
+        "kodeBarang": {
+          "type": "string",
+          "description": "Kode unik barang"
+        },
+        "namaBarang": {
+          "type": "string",
+          "description": "Nama barang atau reagen"
+        },
+        "satuan": {
+          "type": "string",
+          "description": "Satuan unit barang (e.g., Kit, Botol, Pcs)"
+        },
+        "stokMinimum": {
+          "type": "number",
+          "description": "Jumlah stok minimum aman sebelum pemesanan ulang"
+        },
+        "kategori": {
+          "type": "string",
+          "description": "Kategori divisi laboratorium"
+        }
+      },
+      "required": ["kodeBarang", "namaBarang", "satuan", "stokMinimum", "kategori"]
+    },
+    "BatchStok": {
+      "title": "BatchStok",
+      "description": "Stok barang spesifik berdasarkan tanggal kadaluarsa (FEFO)",
+      "type": "object",
+      "properties": {
+        "kodeBarang": {
+          "type": "string",
+          "description": "Kode referensi barang"
+        },
+        "tanggalExpired": {
+          "type": "string",
+          "description": "Tanggal kadaluarsa format YYYY-MM-DD"
+        },
+        "jumlah": {
+          "type": "number",
+          "description": "Jumlah unit yang tersedia"
+        }
+      },
+      "required": ["kodeBarang", "tanggalExpired", "jumlah"]
+    },
+    "MutasiBarang": {
+      "title": "MutasiBarang",
+      "description": "Jurnal mutasi masuk dan keluar barang lab",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "jenis": {
+          "type": "string",
+          "enum": ["MASUK", "KELUAR"]
+        },
+        "kodeBarang": {
+          "type": "string"
+        },
+        "jumlah": {
+          "type": "number"
+        },
+        "tanggal": {
+          "type": "string"
+        },
+        "tanggalExpired": {
+          "type": "string"
+        },
+        "keterangan": {
+          "type": "string"
+        },
+        "operator": {
+          "type": "string"
+        },
+        "picLuarNip": {
+          "type": "string"
+        },
+        "picLuarNama": {
+          "type": "string"
+        },
+        "noSuratReferensi": {
+          "type": "string"
+        }
+      },
+      "required": ["id", "jenis", "kodeBarang", "jumlah", "tanggal", "keterangan", "operator"]
+    },
+    "PermintaanBarang": {
+      "title": "PermintaanBarang",
+      "description": "Surat permintaan barang atau reagen lab ke logistik",
+      "type": "object",
+      "properties": {
+        "noSurat": {
+          "type": "string"
+        },
+        "tanggal": {
+          "type": "string"
+        },
+        "tujuan": {
+          "type": "string",
+          "enum": ["Logistik Farmasi", "ATK"]
+        },
+        "isCito": {
+          "type": "boolean"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["Diproses", "Diterima Sebagian", "Diterima Penuh", "Ditolak"]
+        },
+        "ttdKepalaNip": {
+          "type": "string"
+        },
+        "ttdKepalaNama": {
+          "type": "string"
+        },
+        "tanggalTtd": {
+          "type": "string"
+        },
+        "items": {
+          "type": "array"
+        }
+      },
+      "required": ["noSurat", "tanggal", "tujuan", "isCito", "items", "status", "ttdKepalaNip", "ttdKepalaNama", "tanggalTtd"]
+    },
+    "LogPenerimaan": {
+      "title": "LogPenerimaan",
+      "description": "Penerimaan riil barang logistik",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "noSuratReferensi": {
+          "type": "string"
+        },
+        "tanggal": {
+          "type": "string"
+        },
+        "operatorNip": {
+          "type": "string"
+        },
+        "operatorNama": {
+          "type": "string"
+        },
+        "logfarNip": {
+          "type": "string"
+        },
+        "logfarNama": {
+          "type": "string"
+        },
+        "items": {
+          "type": "array"
+        }
+      },
+      "required": ["id", "tanggal", "operatorNip", "operatorNama", "logfarNip", "logfarNama", "items"]
+    },
+    "SystemSettings": {
+      "title": "SystemSettings",
+      "description": "Pengaturan cetak, backup, dan penanggung jawab sistem",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "backupEnabled": {
+          "type": "boolean"
+        },
+        "backupSchedule": {
+          "type": "string",
+          "enum": ["Harian", "Mingguan", "Manual"]
+        },
+        "pilihanKertas": {
+          "type": "string",
+          "enum": ["A4", "F4", "Letter"]
+        },
+        "marginAtas": {
+          "type": "number"
+        },
+        "marginBawah": {
+          "type": "number"
+        },
+        "marginKiri": {
+          "type": "number"
+        },
+        "marginKanan": {
+          "type": "number"
+        },
+        "penanggungJawabNip": {
+          "type": "string"
+        },
+        "penanggungJawabNama": {
+          "type": "string"
+        },
+        "penanggungJawabJabatan": {
+          "type": "string"
+        },
+        "lastBackupTime": {
+          "type": "string"
+        }
+      },
+      "required": ["id", "backupEnabled", "backupSchedule", "pilihanKertas", "marginAtas", "marginBawah", "marginKiri", "marginKanan", "penanggungJawabNip", "penanggungJawabNama", "penanggungJawabJabatan"]
+    },
+    "LaporanBulanan": {
+      "title": "LaporanBulanan",
+      "description": "Snapshot data penanggung jawab laporan bulanan saat dicetak",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "bulan": {
+          "type": "string"
+        },
+        "tahun": {
+          "type": "string"
+        },
+        "penanggungJawabNip": {
+          "type": "string"
+        },
+        "penanggungJawabNama": {
+          "type": "string"
+        },
+        "penanggungJawabJabatan": {
+          "type": "string"
+        },
+        "tanggalCetak": {
+          "type": "string"
+        }
+      },
+      "required": ["id", "bulan", "tahun", "penanggungJawabNip", "penanggungJawabNama", "penanggungJawabJabatan", "tanggalCetak"]
+    }
+  },
+  "firestore": {
+    "/pegawai/{nip}": {
+      "schema": "Pegawai",
+      "description": "Collection pegawai rumah sakit"
+    },
+    "/barang/{kodeBarang}": {
+      "schema": "Barang",
+      "description": "Master barang logistik laboratorium"
+    },
+    "/stok/{stokId}": {
+      "schema": "BatchStok",
+      "description": "Batch stok reagen/BMHP"
+    },
+    "/mutasi/{mutasiId}": {
+      "schema": "MutasiBarang",
+      "description": "Jurnal mutasi logistik laboratorium"
+    },
+    "/permintaan/{permintaanId}": {
+      "schema": "PermintaanBarang",
+      "description": "Pengajuan permintaan barang"
+    },
+    "/penerimaan/{penerimaanId}": {
+      "schema": "LogPenerimaan",
+      "description": "Penerimaan barang dari instansi logistik luar"
+    },
+    "/SystemSettings/{settingsId}": {
+      "schema": "SystemSettings",
+      "description": "Pengaturan cetak, backup, dan penanggung jawab sistem"
+    },
+    "/LaporanBulanan/{reportId}": {
+      "schema": "LaporanBulanan",
+      "description": "Snapshot data penanggung jawab laporan bulanan saat dicetak"
+    }
+  }
+}
