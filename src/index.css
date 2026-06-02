@@ -1,0 +1,272 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --color-natural-bg: #F4F7F5;
+  --color-natural-text: #2D3A3A;
+  --color-natural-sidebar: #2D4A4A;
+  --color-natural-sidebar-hover: #3D5A5A;
+  --color-natural-accent: #88C070;
+  --color-natural-accent-hover: #78B060;
+  --color-natural-heading: #1A2A2A;
+  --color-natural-muted: #7A8A8A;
+  --color-natural-border: #E0E7E2;
+  --color-natural-border-light: #F0F4F1;
+  --color-natural-row-bg: #F9FAF9;
+
+  --color-natural-alert-bg: #FFF4F2;
+  --color-natural-alert-border: #FFDAD4;
+  --color-natural-alert-text: #D44A4A;
+  
+  --color-natural-card: #ffffff;
+}
+
+/* Custom Styles for Silolab Prima */
+body {
+  font-family: var(--font-sans);
+  background-color: #F4F7F5;
+  color: #2D3A3A;
+}
+
+/* Simulated Barcode animation */
+@keyframes scanning {
+  0% { top: 0%; }
+  50% { top: 100%; }
+  100% { top: 0%; }
+}
+
+.scanner-laser {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: #ef4444;
+  box-shadow: 0 0 8px #f87171, 0 0 15px #ef4444;
+  animation: scanning 2.5s infinite linear;
+}
+
+/* Media Print Configuration for Crisp PDF Outputs */
+@media print {
+  @page {
+    size: A4;
+    margin: 5mm;
+  }
+
+  /* Ensure global reset to pure white background and remove all shadows/margins */
+  html, body, #root, main, .fixed.inset-0.z-50, .fixed.inset-0.z-50 > div, [id^="printable-"] {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    box-shadow: none !important;
+    border: none !important;
+    outline: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    position: static !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Standard layout elements and non-print classes must be completely hidden */
+  aside, header, nav, footer, .no-print, button {
+    display: none !important;
+  }
+
+  /* In print mode, override modal backgrounds, blurs and overlays to be completely transparent */
+  .fixed.inset-0.z-50, .backdrop-blur-sm, .bg-black\/60 {
+    background: transparent !important;
+    background-color: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  /* Ensure .print-area occupies full page bounds transparently */
+  .print-area {
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    display: block !important;
+    color: black !important;
+    overflow: visible !important;
+    position: relative !important;
+  }
+
+  /* Normalize fonts for black-and-white printing */
+  h1, h2, h3, h4, p, span, th, td {
+    color: #000000 !important;
+  }
+
+  /* Avoid page breaks inside table rows */
+  tr {
+    page-break-inside: avoid !important;
+  }
+
+  /* Prevent split of signature blocks across pages */
+  .signature-container {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    margin-top: 40px !important;
+    width: 100%;
+    display: block !important;
+  }
+
+  .signature-container-single {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    margin-top: 40px !important;
+    width: 100% !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .signature-block {
+    text-align: center !important;
+    width: 280px !important;
+    font-size: 12px !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    display: block !important;
+    background: transparent !important;
+  }
+
+  /* Remove all outer gray boxes, borders and shadows of modals during print */
+  .fixed, [class*="max-w-4xl"], [class*="max-w-3xl"], [class*="w-full"], [id^="printable-"] {
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+    background-color: transparent !important;
+    background: transparent !important;
+  }
+
+  /* Make sure tables retain clean administrative border lines */
+  table, th, td {
+    border-color: #a8a29e !important; /* Stone border for professional look */
+  }
+
+  table {
+    page-break-after: auto;
+  }
+
+  /* Support for 2cm x 5cm barcode sticker printing (Printer TSC TTP 244 Pro) */
+  @page barcode-sticker-page {
+    size: 50mm 20mm !important;
+    margin: 0 !important;
+  }
+
+  body.printing-barcode-active {
+    width: 50mm !important;
+    height: 20mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+  }
+
+  body.printing-barcode-active #root,
+  body.printing-barcode-active aside,
+  body.printing-barcode-active header,
+  body.printing-barcode-active nav,
+  body.printing-barcode-active main,
+  body.printing-barcode-active footer,
+  body.printing-barcode-active .no-print {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    opacity: 0 !important;
+  }
+
+  body.printing-barcode-active .barcode-label-print-container {
+    display: block !important;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 50mm !important;
+    height: 20mm !important;
+    background-color: #ffffff !important;
+    background: #ffffff !important;
+    z-index: 9999999 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  body.printing-barcode-active .barcode-label-print-container .flex {
+    display: flex !important;
+  }
+
+  body.printing-barcode-active .barcode-label-print-container div,
+  body.printing-barcode-active .barcode-label-print-container img,
+  body.printing-barcode-active .barcode-label-print-container span {
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+}
+
+/* ==========================================
+   OPTIMASI MOBILE BARCODE SCANNER (HTML5-QRCODE)
+   ========================================== */
+.scanner-container {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 auto !important;
+  position: relative !important;
+  aspect-ratio: 16 / 9 !important;
+}
+
+/* Force video to fill container proportionally and cover the container cleanly without distortion */
+#pemakaian-camera-scanner-view video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: 12px !important;
+  transform: none !important;
+}
+
+#pemakaian-camera-scanner-view {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}
+
+/* Specific html5-qrcode library ID overrides requested (including container, scanning region, and video elements) */
+#qr-reader, #pemakaian-camera-scanner-view__scan_region {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+#pemakaian-camera-scanner-view__scan_region video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
+/* Hide fallback QR code scanner messages to look premium */
+#pemakaian-camera-scanner-view img {
+  display: none !important;
+}
+
+#pemakaian-camera-scanner-view a {
+  display: none !important;
+}
+
